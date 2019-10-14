@@ -248,7 +248,7 @@ class SETHandler(BaseHTTPRequestHandler):
             pass
 
         webroot = os.path.abspath(os.path.join(userconfigpath, 'web_clone'))
-        requested_file = os.path.abspath(os.path.join(webroot, self.path))
+        requested_file = os.path.abspath(os.path.join(webroot, os.path.relpath(self.path, '/')))
         # try block setup to catch transmission errors
         try:
 
@@ -276,12 +276,7 @@ class SETHandler(BaseHTTPRequestHandler):
                 # visits.close()
 
             else:
-                if not requested_file.startswith(webroot + os.path.sep):
-                    print('directory traversal attempt detected from: ' + self.client_address[0])
-                    self.send_response(404)
-                    self.end_headers()
-
-                elif os.path.isfile(requested_file):
+                if os.path.isfile(requested_file):
                     self.send_response(200)
                     self.end_headers()
                     fileopen = open(requested_file, "rb")
@@ -434,10 +429,8 @@ def run():
             if apache_counter == 1:
 
                 # check if we are running apache mode
-                print_status(
-                    "Successfully stopped Apache. Starting the credential harvester.")
-                print_status(
-                    "Harvester is ready, have victim browse to your site.")
+                print_status("Successfully stopped Apache. Starting the credential harvester.")
+                print_status("Harvester is ready, have victim browse to your site.")
                 if apache_check == False:
                     try:
 
@@ -465,11 +458,11 @@ def run():
                     except Exception:
                         apache_counter = 0
 
-            if apache_counter == 0:
-                print(bcolors.GREEN + "[*] Try disabling Apache and try SET again." + bcolors.ENDC)
-                print("[*] Printing error: " + str(e) + "\n")
-                return_continue()
-                exit_set()
+            #if apache_counter == 0:
+            #    print(bcolors.GREEN + "[*] Try disabling Apache and try SET again." + bcolors.ENDC)
+            #    print("[*] Printing error: " + str(e) + "\n")
+            #    return_continue()
+            #    exit_set()
 
     # if we are using apache, then use the harvester php type that writes it out to post.php
     # note just change the index.html to post somewhere else and rename the
